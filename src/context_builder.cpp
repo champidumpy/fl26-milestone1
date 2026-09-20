@@ -7,7 +7,8 @@ std::vector<ContextItem> ContextBuilder::build(const std::vector<SearchResult>& 
     std::vector<ContextItem> con;
     std::size_t totaltokens = 0;
     for(const auto& result : ranked) {
-        std::size_t tokenamount = result.text.size();
+        auto tokens = TextProcessor::tokenize(result.text);
+        std::size_t tokenamount = tokens.size();
         if(totaltokens + tokenamount <= token_budget) {
             con.push_back({result.chunk_id, result.document_id, result.chunk_sequence,result.text,tokenamount,result.score, false});
             totaltokens += tokenamount;

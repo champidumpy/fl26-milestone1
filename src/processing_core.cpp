@@ -29,15 +29,16 @@ std::string ProcessingCore::normalize(const std::string& text) {
 
 void ProcessingCore::rebuild(const Workspace& workspace) {
     std::vector<Chunk> newchunks;
-    ChunkingPolicy policy{120,20,20};
-    Chunker chunker(policy);
-    std::unordered_set<std::string> seen;
-    for(const auto& doc : workspace.documents()) {
-        if(seen.find(doc.id()) != seen.end()) {
-            throw std::invalid_argument("same doc id");
+    std::unordered_set<std::string> document_ids;
+    std::size_t document_order = 0;
+    for(const auto& document : workspace.documents()) {
+        if(!document_ids.insert(document.id()).second) {
+            throw std::invalid_argument("same document id");
         }
-        auto c = chunker.chunk(doc, newchunks.size());
-        newchunks.insert(newchunks.end(), c.begin(), c.end());
+        Chunker chunker({kMaxChunkTokens, kChunkOverlap, kParagraphPreferenceWindow});
+        auto document_chunks = chunker.chunk(document, document_order);
+        newchunks.insert(newchunks.end(), document_chunks.begin(), document_chunks.end());
+        document_order++;
     }
     CorpusIndex newindex(newchunks);
     impl_->chunks = std::move(newchunks);

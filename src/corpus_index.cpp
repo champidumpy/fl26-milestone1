@@ -2,6 +2,7 @@
 #include "aiws/text_processor.hpp"
 #include <unordered_set>
 #include <unordered_map>
+#include <stdexcept>
 namespace aiws {
 
 CorpusIndex::CorpusIndex(const std::vector<Chunk>& chunks) {
@@ -27,11 +28,15 @@ void CorpusIndex::build(const std::vector<Chunk>& chunks) {
 
 std::size_t CorpusIndex::document_frequency(
     const std::string& normalized_term) const noexcept {
-    auto it = postings_.find(normalized_term);
-    if(it == postings_.end()) {
+    auto terms = TextProcessor::terms(normalized_term);
+    if(terms.size() == 0) {
         return 0;
     }
     // TODO: return how many chunks contain the requested term.
+    auto it = postings_.find(normalized_term);
+    if(it == postings_.end()) {
+        return 0;
+    }   
     return it->second.size();
 }
 

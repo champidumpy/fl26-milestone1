@@ -39,11 +39,12 @@ std::vector<SearchResult> RetrievalEngine::search(const std::string& query,
             }
             match++;
             double df = index.document_frequency(term);
-            double idf = std::log((chunkcount + 1.0) / (1.0 + df)) + 1.0;
-            if(tf > 0 && df > 0) {
-                score += static_cast<double>(tf) / df;
+            double idf = std::log((static_cast<double>(chunkcount) + 1.0) / (1.0 + static_cast<double>(df))) + 1.0;
+            score += static_cast<double>(tf) / df;
+            if(tf > 0) {
                 match++;
             }
+
         }
         if (match == 0) {
             continue;
