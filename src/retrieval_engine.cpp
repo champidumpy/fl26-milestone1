@@ -1,3 +1,4 @@
+
 #include "aiws/retrieval_engine.hpp"
 #include "aiws/text_processor.hpp"
 #include <unordered_set>
@@ -27,12 +28,12 @@ std::vector<SearchResult> RetrievalEngine::search(const std::string& query,
     if(uniquet.empty()) {
         return {};
     }
-    std::vector<std::pair<const Chunk*, SearchResult>> scored;
+    std::vector<SearchResult> results;
     std::size_t chunkcount = chunks.size();
     
     for(std::size_t i = 0; i < chunkcount; ++i) {
         const Chunk& chunk = chunks[i];
-        double score1 = 0.0;
+        double score = 0.0;
         std::size_t match = 0;
         for(const auto& term : uniquet) {
             std::size_t tf = index.term_frequency(term, chunk.id);
@@ -41,9 +42,8 @@ std::vector<SearchResult> RetrievalEngine::search(const std::string& query,
             }
 
             std::size_t df = index.document_frequency(term);
-            double weight = 1.0 + std::log(static_cast<double>(tf));
             double idf = std::log((static_cast<double>(chunkcount) + 1.0) / (1.0 + static_cast<double>(df))) + 1.0;
-                score1 += weight * idf;
+                score += static_cast<double>(tf) * idf;
                 match++;
 
         }
@@ -51,8 +51,8 @@ std::vector<SearchResult> RetrievalEngine::search(const std::string& query,
             continue;
         }
 
-        double coverage =  1.0 + 0.10 * static_cast<double>(match) / static_cast<double>(uniquet.size());
-        double score = score1 * coverage;
+        double coverage =  static_cast<double>(match) / static_cast<double>(uniquet.size());
+        score += coverage;
         SearchResult result;
         result.document_id = chunk.document_id;
         result.chunk_id = chunk.id; 
@@ -60,10 +60,10 @@ std::vector<SearchResult> RetrievalEngine::search(const std::string& query,
         result.text = chunk.text;
         result.score = canonical_score(score);
         result.matched_terms = match;
-        scored.emplace_back(&chunk ,result);
+        results.push_back(result);
 
     }
-    std::sort(scored.begin(), scored.end(), [](const SearchResult& a, const SearchResult& b) {
+    std::sort(results.begin(), results.end(), [](const SearchResult& a, const SearchResult& b) {
         if(a.score != b.score) {
             return a.score > b.score;
         }
@@ -79,4 +79,3 @@ std::vector<SearchResult> RetrievalEngine::search(const std::string& query,
 }
 
 }  // namespace aiws
-
