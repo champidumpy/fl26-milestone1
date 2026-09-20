@@ -11,7 +11,7 @@ Chunker::Chunker(ChunkingPolicy policy) : policy_(policy) {
     }
 }
 
-std::vector<Chunk> Chunker::chunk(const Document&, std::size_t) const {
+std::vector<Chunk> Chunker::chunk(const Document& document, std::size_t document_order  ) const {
     // TODO: produce deterministic, source-attributed chunks for the supplied document.
     std::vector<Chunk> chunks;
     auto tokens = TextProcessor::tokenize(document.text());
@@ -24,17 +24,19 @@ std::vector<Chunk> Chunker::chunk(const Document&, std::size_t) const {
         std::size_t end = std::min(start + policy_.max_tokens, tokens.size());
         std::size_t e = end; 
         if(end - start == policy_.max_tokens) {
-            std::size_t window = (e>= policy_.paragraph_window) ? e - policy_.paragraph_window : start;
+            std::size_t window = (end>= policy_.paragraph_window) ? end - policy_.paragraph_window : start;
         }
         for(std::size_t i = end; i > start; --i) {
-            if(tokens[i-1].paragraph < tokens[i-1].paragraph) {
+            if(i < tokens.size() && tokens[i-1].paragraph != tokens[i-1].paragraph) {
                 end = i;
                 break;
             }
         }
         Chunk c;
-        c.document_id = doc.id();
-        c.id = doc.id() + "#" + std::to_string(se);
+        c.document_id = document.id();
+        c.document_order = document.order();
+        c.sequence = chunks.size();
+        c.id = document.id() + "#" + std::to_string(c.sequence);
         c.token_count = end - start;
         c.text = TextProcessor::join(tokens, start, end);
         c.source_begin = tokens[start].begin;
@@ -43,7 +45,11 @@ std::vector<Chunk> Chunker::chunk(const Document&, std::size_t) const {
         if(end >= tokens.size()) {
             break;
         }
-        start = end - policy_.overlap;
+        if(end < policy_.overlap) {
+            start = 0;
+        } else {
+            start = end - policy_.overlap;
+        }
     }
 
     return chunks;

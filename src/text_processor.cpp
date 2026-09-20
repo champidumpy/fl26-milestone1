@@ -25,12 +25,12 @@ std::vector<TokenInfo> TextProcessor::tokenize(const std::string& text) {
             if(currentToken.empty()) {
                 start = i;
             }
-            currentToken += c;
+            currentToken += static_cast<char>(std::tolower(c));
         } else if(std::isdigit(c)) {
             if(currentToken.empty()) {
                 start = i;
             }
-            currentToken += c;
+            currentToken += static_cast<char>(std::tolower(c));
         } 
         else {
             if(!currentToken.empty()) {
@@ -61,9 +61,9 @@ std::string TextProcessor::normalize(const std::string& text) {
     return join(tokens, 0, tokens.size());
 }
 
-std::string TextProcessor::join(const std::vector<TokenInfo>&,
-                                std::size_t,
-                                std::size_t) {
+std::string TextProcessor::join(const std::vector<TokenInfo>& tokens,
+                                std::size_t begin,
+                                std::size_t end) {
     // TODO: join the requested token range into normalized text.
     std::string output;
     for(std::size_t i = begin; i < end && i < tokens.size(); i++) {
