@@ -19,8 +19,8 @@ void CorpusIndex::build(const std::vector<Chunk>& chunks) {
         for(const auto& token : terms) {
             termfreq[token]++;
         }
-        for(const auto& [term, freq] : termfreq) {
-            postings_[term].push_back({chunks[i].chunk_id, freq});
+        for(const auto& entry : termfreq) {
+            postings_[entry.first].push_back({chunks[i].chunk_id, entry.second});
         }
     }
     // TODO: build the searchable index from the supplied chunks.
@@ -29,8 +29,11 @@ void CorpusIndex::build(const std::vector<Chunk>& chunks) {
 std::size_t CorpusIndex::document_frequency(
     const std::string& normalized_term) const noexcept {
     auto it = postings_.find(normalized_term);
+    if(it == postings_.end()) {
+        return 0;
+    }
     // TODO: return how many chunks contain the requested term.
-    return (it == postings_.end()) ? 0 : it->second.size();
+    return it->second.size();
 }
 
 std::size_t CorpusIndex::term_frequency(
@@ -44,7 +47,7 @@ std::size_t CorpusIndex::term_frequency(
         if(chunk_it == chunk_by_id_.end()) {
             return 0;
         }
-        std::size_t chunk_index = chunk_it->second;
+        std::size_t wanted_index = chunk_it->second;
         for(const auto& posting : it->second) {
             if(posting.chunk_index == wanted_index) {
                 return posting.frequency;
@@ -57,18 +60,18 @@ std::size_t CorpusIndex::term_frequency(
 const std::vector<CorpusIndex::Posting>* CorpusIndex::postings(
     const std::string& normalized_term) const noexcept {
     auto it = postings_.find(normalized_term);
-    if(it != postings_.end()) {
+    if(it == postings_.end()) {
         return nullptr;
     }
     // TODO: return the postings associated with the requested term.
-    return  &(it->second);
+    return  &it->second;
 }
 
 const Chunk* CorpusIndex::find_chunk(
     const std::vector<Chunk>& chunks,
     const std::string& chunk_id) const noexcept {
         auto  it = chunk_by_id_.find(chunk_id); 
-        if(it != chunk_by_id_.end()) {
+        if(it == chunk_by_id_.end()) {
             return nullptr;
         }
 
