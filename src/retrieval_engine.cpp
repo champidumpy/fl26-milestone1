@@ -1,4 +1,3 @@
-
 #include "aiws/retrieval_engine.hpp"
 #include "aiws/text_processor.hpp"
 #include <unordered_set>
