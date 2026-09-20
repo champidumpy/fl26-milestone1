@@ -3,6 +3,8 @@
 #include "aiws/retrieval_engine.hpp"
 #include "aiws/context_builder.hpp"
 #include "aiws/chunker.hpp"
+#include <unordered_set>
+#include <stdexcept>
 namespace aiws {
 
 struct ProcessingCore::Impl {

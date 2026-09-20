@@ -8,13 +8,13 @@ CorpusIndex::CorpusIndex(const std::vector<Chunk>& chunks) {
     build(chunks);
 }
 
-static std::unordered_map<std::string, std::vector<Posting>> index_;
-static std::unordered_map<std::string, std::size_t> chunk_lookup_;
-static std::vector<Chunk> chunks_;
+std::unordered_map<std::string, std::vector<Posting>> index_;
+std::unordered_map<std::string, std::size_t> chunk_lookup_;
+  std::vector<Chunk> chunks_;
 void CorpusIndex::build(const std::vector<Chunk>& chunks) {
     index_.clear();
     chunk_lookup_.clear();
-    storechunks = chunks;
+    chunks_ = chunks;
     for(std::size_t i = 0; i < chunks.size(); i++) {
         chunk_lookup_[chunks[i].chunk_id] = i;
         auto terms = TextProcessor::terms(chunks[i].text);
