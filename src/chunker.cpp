@@ -23,13 +23,16 @@ std::vector<Chunk> Chunker::chunk(const Document& document, std::size_t document
         std::size_t end = std::min(start + policy_.max_tokens, tokens.size());
 
         if(end - start == policy_.max_tokens) {
-            std::size_t window_start = (end>= policy_.paragraph_window) ? end - policy_.paragraph_window : start;
+            std::size_t window_start = start;
+            if(end > policy_.paragraph_window) {
+                window_start = end - policy_.paragraph_window;
+            }
         
         if(window_start < start) {
             window_start = start;
         }
         for(std::size_t i = end; i > window_start; --i) {
-            if(i < tokens.size() && tokens[i-1].paragraph != tokens[i-1].paragraph) {
+            if(i < tokens.size() && tokens[i-1].paragraph != tokens[i].paragraph) {
                 if(i>start + policy_.overlap) {
                     end = i;
                 }                

@@ -50,7 +50,7 @@ std::vector<SearchResult> RetrievalEngine::search(const std::string& query,
         }
 
         double coverage =  static_cast<double>(match) / static_cast<double>(uniquet.size());
-        score *= 1.0 + 0.1 * coverage;
+        score += coverage;
         SearchResult result;
         result.document_id = chunk.document_id;
         result.chunk_id = chunk.id; 

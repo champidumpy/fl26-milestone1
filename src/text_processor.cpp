@@ -9,21 +9,23 @@ std::vector<TokenInfo> TextProcessor::tokenize(const std::string& text) {
     std::size_t start = 0;
     std::string currentToken;
 
+
+    bool previousline = false;
     for (std::size_t i = 0; i < text.size(); ++i) {
     
         unsigned char c = static_cast<unsigned char>(text[i]);
         if (c == '\n') {
-            bool blank_line = true;
-            if(i>0 && text[i-1] != '\n') {
-                blank_line = false;
+            if(previousline) {
+                paragraph++;
             }
-            else if(i>= 3 && text[i-3] == '\r' && text[i-2] == '\n' && text[i-1] == '\r') {
-            blank_line = false;
+            previousline = true;
         }
-          if(blank_line) {
-            paragraph++;
-          }
+        else if(c== '\r'){
+
         } 
+        else {
+            previousline = false;
+        }
         if(std::isalpha(c)) {
             if(currentToken.empty()) {
                 start = i;
