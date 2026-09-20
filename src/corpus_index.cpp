@@ -11,16 +11,15 @@ CorpusIndex::CorpusIndex(const std::vector<Chunk>& chunks) {
 void CorpusIndex::build(const std::vector<Chunk>& chunks) {
     postings_.clear();
     chunk_by_id_.clear();
-    chunks_ = chunks;
     for(std::size_t i = 0; i < chunks.size(); i++) {
-        chunk_by_id_[chunks[i].chunk_id] = i;
+        chunk_by_id_[chunks[i].id] = i;
         auto terms = TextProcessor::terms(chunks[i].text);
         std::unordered_map<std::string, std::size_t> termfreq;
         for(const auto& token : terms) {
             termfreq[token]++;
         }
         for(const auto& entry : termfreq) {
-            postings_[entry.first].push_back({chunks[i].chunk_id, entry.second});
+            postings_[entry.first].push_back({i, entry.second});
         }
     }
     // TODO: build the searchable index from the supplied chunks.

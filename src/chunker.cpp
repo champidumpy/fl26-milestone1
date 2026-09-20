@@ -34,7 +34,7 @@ std::vector<Chunk> Chunker::chunk(const Document& document, std::size_t document
         }
         Chunk c;
         c.document_id = document.id();
-        c.document_order = document.order();
+        c.document_order = document_order;
         c.sequence = chunks.size();
         c.id = document.id() + "#" + std::to_string(c.sequence);
         c.token_count = end - start;
