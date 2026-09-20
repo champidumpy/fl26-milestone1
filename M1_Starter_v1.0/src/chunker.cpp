@@ -1,5 +1,5 @@
 #include "aiws/chunker.hpp"
-
+#include "aiws/text_processor.hpp"
 #include <stdexcept>
 
 namespace aiws {
@@ -13,7 +13,40 @@ Chunker::Chunker(ChunkingPolicy policy) : policy_(policy) {
 
 std::vector<Chunk> Chunker::chunk(const Document&, std::size_t) const {
     // TODO: produce deterministic, source-attributed chunks for the supplied document.
-    return {};
+    std::vector<Chunk> chunks;
+    auto tokens = TextProcessor::tokenize(document.text());
+    if (tokens.empty()) {
+        return chunks;
+    }
+    std::size_t start = 0;
+    std::size_t se = 0;
+    while(start < tokens.size()) {
+        std::size_t end = std::min(start + policy_.max_tokens, tokens.size());
+        std::size_t e = end; 
+        if(end - start == policy_.max_tokens) {
+            std::size_t window = (e>= policy_.paragraph_window) ? e - policy_.paragraph_window : start;
+        }
+        for(std::size_t i = end; i > start; --i) {
+            if(tokens[i-1].paragraph < tokens[i-1].paragraph) {
+                end = i;
+                break;
+            }
+        }
+        Chunk c;
+        c.document_id = doc.id();
+        c.id = doc.id() + "#" + std::to_string(se);
+        c.token_count = end - start;
+        c.text = TextProcessor::join(tokens, start, end);
+        c.source_begin = tokens[start].begin;
+        c.source_end = tokens[end-1].end;
+        chunks.push_back(c);
+        if(end >= tokens.size()) {
+            break;
+        }
+        start = end - policy_.overlap;
+    }
+
+    return chunks;
 }
 
 }  // namespace aiws
