@@ -40,7 +40,7 @@ std::vector<SearchResult> RetrievalEngine::search(const std::string& query,
             match++;
             double df = index.document_frequency(term);
             double idf = std::log((static_cast<double>(chunkcount) + 1.0) / (1.0 + static_cast<double>(df))) + 1.0;
-            std::size_t tf = index.term_frequency(term, chunk.id);
+             tf = index.term_frequency(term, chunk.id);
             
             if(tf > 0) {
                 score += static_cast<double>(tf) * idf;

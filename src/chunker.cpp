@@ -19,12 +19,12 @@ std::vector<Chunk> Chunker::chunk(const Document& document, std::size_t document
         return chunks;
     }
     std::size_t start = 0;
-    std::size_t se = 0;
+std::size_t window = 0;
     while(start < tokens.size()) {
         std::size_t end = std::min(start + policy_.max_tokens, tokens.size());
-        std::size_t e = end; 
+
         if(end - start == policy_.max_tokens) {
-            std::size_t window = (end>= policy_.paragraph_window) ? end - policy_.paragraph_window : start;
+            window = (end>= policy_.paragraph_window) ? end - policy_.paragraph_window : start;
         }
         for(std::size_t i = end; i > start; --i) {
             if(i < tokens.size() && tokens[i-1].paragraph != tokens[i-1].paragraph) {
