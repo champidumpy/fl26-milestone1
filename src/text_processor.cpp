@@ -66,7 +66,7 @@ std::string TextProcessor::join(const std::vector<TokenInfo>&,
                                 std::size_t) {
     // TODO: join the requested token range into normalized text.
     std::string output;
-    for(std::size_t i = begin; i < end; && i < tokens.size(); ++i) {
+    for(std::size_t i = begin; i < end && i < tokens.size(); i++) {
         if(!output.empty()) {
             output += " ";
         }

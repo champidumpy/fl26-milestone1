@@ -1,5 +1,9 @@
 #include "aiws/retrieval_engine.hpp"
 #include "aiws/text_processor.hpp"
+#include <unordered_set>
+#include <cmath>
+#include <algorithm>
+#include <stdexcept>
 namespace aiws {
 
 double RetrievalEngine::canonical_score(double value) {
@@ -52,7 +56,6 @@ std::vector<SearchResult> RetrievalEngine::search(const std::string& query,
         result.document_id = chunk.document_id;
         result.chunk_id = chunk.id; 
         result.score = score;
-        result.chunk_index = i;
         results.push_back(result);
 
     }
@@ -63,7 +66,7 @@ std::vector<SearchResult> RetrievalEngine::search(const std::string& query,
         if(a.document_id != b.document_id) {
             return a.document_id < b.document_id;
         }
-        return a.chunk_index < b.chunk_index;
+        return a.chunk_id < b.chunk_id;
     });
     if(k == 0){
         return {};
