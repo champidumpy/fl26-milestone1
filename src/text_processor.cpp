@@ -10,46 +10,43 @@ std::vector<TokenInfo> TextProcessor::tokenize(const std::string& text) {
     std::string currentToken;
 
 
-    bool previousline = false;
+    bool blank = true;
+    bool broke = false;
     for (std::size_t i = 0; i < text.size(); ++i) {
     
         unsigned char c = static_cast<unsigned char>(text[i]);
-        if (c == '\n') {
-            if(previousline) {
+        if (std::isalum(c)) {
+            if(currentToken.empty()) {
+                if(broke && !tokens.empty()){
                 paragraph++;
-            }
-            previousline = true;
-        }
-        else if(c== '\r'){
-
-        } 
-        else {
-            previousline = false;
-        }
-        if(std::isalpha(c)) {
-            if(currentToken.empty()) {
+                }
+                broke = false;
                 start = i;
             }
             currentToken += static_cast<char>(std::tolower(c));
-        } else if(std::isdigit(c)) {
-            if(currentToken.empty()) {
-                start = i;
-            }
-            currentToken += static_cast<char>(std::tolower(c));
-        } 
+            blank = false;
+        }
         else {
-            if(!currentToken.empty()) {
+            if(!currentToken.empty()){
                 tokens.push_back(TokenInfo{currentToken, start, i, paragraph});
                 currentToken.clear();
             }
+            if(c == '\n'){
+                if(blank){
+                    broke = true;
+                }
+                blank = true;
+            } else if(!std::isspace(c)){
+                blank = false; 
+            }
         }
     }
-    if(!currentToken.empty()) {
+    if(!currentToken.empty()){
         tokens.push_back(TokenInfo{currentToken, start, text.size(), paragraph});
     }
     return tokens;
-}
 
+}
 std::vector<std::string> TextProcessor::terms(const std::string& text) {
     // TODO: return the normalized terms represented by the input text.
     auto tokens = tokenize(text);

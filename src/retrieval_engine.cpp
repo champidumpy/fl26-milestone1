@@ -16,8 +16,11 @@ std::vector<SearchResult> RetrievalEngine::search(const std::string& query,
                                                   const std::vector<Chunk>& chunks,
                                                   const CorpusIndex& index) const {
     // TODO: return the  ranked search results for the requested query.
-    if(k <= 0) {
+    if(k < 0) {
         throw std::invalid_argument("k needs to be positive");
+    }
+    if(k== 0){
+        return{}
     }
     auto terms = TextProcessor::terms(query);
     std::unordered_set<std::string> uniquet(terms.begin(), terms.end());
@@ -39,8 +42,6 @@ std::vector<SearchResult> RetrievalEngine::search(const std::string& query,
 
             std::size_t df = index.document_frequency(term);
             double idf = std::log((static_cast<double>(chunkcount) + 1.0) / (1.0 + static_cast<double>(df))) + 1.0;
-             tf = index.term_frequency(term, chunk.id);
-            
                 score += static_cast<double>(tf) * idf;
                 match++;
 
@@ -68,7 +69,7 @@ std::vector<SearchResult> RetrievalEngine::search(const std::string& query,
         if(a.document_id != b.document_id) {
             return a.document_id < b.document_id;
         }
-        return a.chunk_id < b.chunk_id;
+        return a.chunk_sequence < b.chunk_sequence;
     });
     if(static_cast<std::size_t>(k) < results.size()) {
         results.resize(static_cast<std::size_t>(k));

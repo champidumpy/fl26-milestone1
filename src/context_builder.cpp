@@ -18,7 +18,7 @@ std::vector<ContextItem> ContextBuilder::build(const std::vector<SearchResult>& 
                 break;
             }
             std::size_t remaining = token_budget - totaltokens;
-            con.push_back({result.chunk_id, result.document_id, result.chunk_sequence,result.text,remaining,result.score, true});
+            con.push_back({result.chunk_id, result.document_id, result.chunk_sequence,TextProcessor::join(tokens,0,remaining),remaining,result.score, true});
             break;
         }
     }
