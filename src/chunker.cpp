@@ -19,19 +19,24 @@ std::vector<Chunk> Chunker::chunk(const Document& document, std::size_t document
         return chunks;
     }
     std::size_t start = 0;
-std::size_t window = 0;
     while(start < tokens.size()) {
         std::size_t end = std::min(start + policy_.max_tokens, tokens.size());
 
         if(end - start == policy_.max_tokens) {
-            window = (end>= policy_.paragraph_window) ? end - policy_.paragraph_window : start;
+            std::size_t window_start = (end>= policy_.paragraph_window) ? end - policy_.paragraph_window : start;
+        
+        if(window_start < start) {
+            window_start = start;
         }
-        for(std::size_t i = end; i > start; --i) {
+        for(std::size_t i = end; i > window_start; --i) {
             if(i < tokens.size() && tokens[i-1].paragraph != tokens[i-1].paragraph) {
-                end = i;
-                break;
+                if(i>start + policy_.overlap) {
+                    end = i;
+                }                
             }
+            break;
         }
+    }
         Chunk c;
         c.document_id = document.id();
         c.document_order = document_order;
@@ -45,11 +50,9 @@ std::size_t window = 0;
         if(end >= tokens.size()) {
             break;
         }
-        if(end < policy_.overlap) {
-            start = 0;
-        } else {
+        
             start = end - policy_.overlap;
-        }
+        
     }
 
     return chunks;

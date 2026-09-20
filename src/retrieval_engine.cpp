@@ -15,12 +15,11 @@ std::vector<SearchResult> RetrievalEngine::search(const std::string& query,
                                                   int k,
                                                   const std::vector<Chunk>& chunks,
                                                   const CorpusIndex& index) const {
-    // TODO: return the ranked search results for the requested query.
+    // TODO: return the  ranked search results for the requested query.
     if(k <= 0) {
         throw std::invalid_argument("k needs to be positive");
     }
-    TextProcessor tp;
-    auto terms = tp.terms(query);
+    auto terms = TextProcessor::terms(query);
     std::unordered_set<std::string> uniquet(terms.begin(), terms.end());
     if(uniquet.empty()) {
         return {};
@@ -37,28 +36,28 @@ std::vector<SearchResult> RetrievalEngine::search(const std::string& query,
             if(tf == 0) {
                 continue;
             }
-            match++;
-            double df = index.document_frequency(term);
+
+            std::size_t df = index.document_frequency(term);
             double idf = std::log((static_cast<double>(chunkcount) + 1.0) / (1.0 + static_cast<double>(df))) + 1.0;
              tf = index.term_frequency(term, chunk.id);
             
-            if(tf > 0) {
                 score += static_cast<double>(tf) * idf;
                 match++;
-            }
 
         }
         if (match == 0) {
             continue;
         }
 
-        double coverage = 1.0 + 0.1 *  static_cast<double>(match) / static_cast<double>(uniquet.size());
-        score *= coverage;
-        score = canonical_score(score);
+        double coverage =  static_cast<double>(match) / static_cast<double>(uniquet.size());
+        score *= 1.0 + 0.1 * coverage;
         SearchResult result;
         result.document_id = chunk.document_id;
         result.chunk_id = chunk.id; 
-        result.score = score;
+        result.chunk_sequence = chunk.sequence;
+        result.text = chunk.text;
+        result.score = canonical_score(score);
+        result.matched_terms = match;
         results.push_back(result);
 
     }
@@ -71,11 +70,8 @@ std::vector<SearchResult> RetrievalEngine::search(const std::string& query,
         }
         return a.chunk_id < b.chunk_id;
     });
-    if(k == 0){
-        return {};
-    }
     if(static_cast<std::size_t>(k) < results.size()) {
-        results.resize(k);
+        results.resize(static_cast<std::size_t>(k));
     }
     return results;
 }
