@@ -27,12 +27,12 @@ std::vector<SearchResult> RetrievalEngine::search(const std::string& query,
     if(uniquet.empty()) {
         return {};
     }
-    std::vector<SearchResult> results;
+    std::vector<std::pair<const Chunk*, SearchResult>> scored;
     std::size_t chunkcount = chunks.size();
     
     for(std::size_t i = 0; i < chunkcount; ++i) {
         const Chunk& chunk = chunks[i];
-        double score = 0.0;
+        double score1 = 0.0;
         std::size_t match = 0;
         for(const auto& term : uniquet) {
             std::size_t tf = index.term_frequency(term, chunk.id);
@@ -41,8 +41,9 @@ std::vector<SearchResult> RetrievalEngine::search(const std::string& query,
             }
 
             std::size_t df = index.document_frequency(term);
+            double weight = 1.0 + std::log(static_cast<double>(tf));
             double idf = std::log((static_cast<double>(chunkcount) + 1.0) / (1.0 + static_cast<double>(df))) + 1.0;
-                score += static_cast<double>(tf) * idf;
+                score1 += weight * idf;
                 match++;
 
         }
@@ -50,8 +51,8 @@ std::vector<SearchResult> RetrievalEngine::search(const std::string& query,
             continue;
         }
 
-        double coverage =  static_cast<double>(match) / static_cast<double>(uniquet.size());
-        score += coverage;
+        double coverage =  1.0 + 0.10 * static_cast<double>(match) / static_cast<double>(uniquet.size());
+        double score = score1 * coverage;
         SearchResult result;
         result.document_id = chunk.document_id;
         result.chunk_id = chunk.id; 

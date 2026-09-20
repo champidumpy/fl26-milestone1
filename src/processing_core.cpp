@@ -59,6 +59,9 @@ std::size_t ProcessingCore::chunk_count() const noexcept {
 
 std::size_t ProcessingCore::document_frequency(const std::string& term) const {
     // TODO: return the document frequency for the requested term.
+    if(TextProcessor::terms(term).size() > 1){
+        throw std::invalid_argument("term normalize to 1 token");
+    }
     return impl_->index.document_frequency(normalize(term));
 }
 
