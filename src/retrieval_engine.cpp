@@ -60,10 +60,10 @@ std::vector<SearchResult> RetrievalEngine::search(const std::string& query,
         result.text = chunk.text;
         result.score = canonical_score(score);
         result.matched_terms = match;
-        results.push_back(result);
+        scored.emplace_back(&chunk ,result);
 
     }
-    std::sort(results.begin(), results.end(), [](const SearchResult& a, const SearchResult& b) {
+    std::sort(scored.begin(), scored.end(), [](const SearchResult& a, const SearchResult& b) {
         if(a.score != b.score) {
             return a.score > b.score;
         }
