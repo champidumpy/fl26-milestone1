@@ -40,8 +40,13 @@ std::size_t CorpusIndex::term_frequency(
         if(it == postings_.end()) {
             return 0;
         }
+        auto chunk_it = chunk_by_id_.find(chunk_id);
+        if(chunk_it == chunk_by_id_.end()) {
+            return 0;
+        }
+        std::size_t chunk_index = chunk_it->second;
         for(const auto& posting : it->second) {
-            if(posting.chunk_index == chunk_id) {
+            if(posting.chunk_index == wanted_index) {
                 return posting.frequency;
             }
         }
@@ -73,8 +78,12 @@ const Chunk* CorpusIndex::find_chunk(
 
 std::size_t CorpusIndex::chunk_index(const std::string& chunk_id) const {
     // TODO: return the stored index of the requested chunk ID.
+
     auto it = chunk_by_id_.find(chunk_id);
-    return (it != chunk_lookup_.end()) ?  0 : it->second;
+    if(it == chunk_by_id_.end()) {
+        return 0;
+    }
+    return it->second;
 }
 
 }  // namespace aiws
