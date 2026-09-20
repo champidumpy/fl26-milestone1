@@ -20,7 +20,7 @@ std::vector<SearchResult> RetrievalEngine::search(const std::string& query,
         throw std::invalid_argument("k needs to be positive");
     }
     if(k== 0){
-        return{}
+        return{};
     }
     auto terms = TextProcessor::terms(query);
     std::unordered_set<std::string> uniquet(terms.begin(), terms.end());

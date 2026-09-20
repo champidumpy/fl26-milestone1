@@ -15,7 +15,7 @@ std::vector<TokenInfo> TextProcessor::tokenize(const std::string& text) {
     for (std::size_t i = 0; i < text.size(); ++i) {
     
         unsigned char c = static_cast<unsigned char>(text[i]);
-        if (std::isalum(c)) {
+        if (std::isalnum(c)) {
             if(currentToken.empty()) {
                 if(broke && !tokens.empty()){
                 paragraph++;

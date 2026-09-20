@@ -31,7 +31,7 @@ std::vector<Chunk> Chunker::chunk(const Document& document, std::size_t document
         if(window_start < start) {
             window_start = start;
         }
-        for(std::size_t i = end; i > window_start && i> start + policy_overlap; --i) {
+        for(std::size_t i = end; i > window_start && i> start + policy_.overlap; --i) {
             if(i < tokens.size() && tokens[i-1].paragraph != tokens[i].paragraph) {
                 if(i>start + policy_.overlap) {
                     end = i;
