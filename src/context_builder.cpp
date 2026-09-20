@@ -7,23 +7,20 @@ std::vector<ContextItem> ContextBuilder::build(const std::vector<SearchResult>& 
     std::vector<ContextItem> con;
     std::size_t totaltokens = 0;
     for(const auto& result : ranked) {
-        if(totaltokens >= token_budget) {
-            break;
-        }   
-        std::size_t tokenamount = result.token_count;
+        std::size_t tokenamount = result.text.size();
         if(totaltokens + tokenamount <= token_budget) {
-            con.push_back({result.document_id, result.chunk_id, tokenamount, false});
+            con.push_back({result.chunk_id, result.document_id, result.chunk_sequence,result.text,tokenamount,result.score, false});
             totaltokens += tokenamount;
-        } else {
-            std::size_t remaining = token_budget - totaltokens;
-            if(remaining > 0) {
-                con.push_back({result.document_id, result.chunk_id, remaining, true});
-                
+        }
+        else{
+            if(totaltokens >= token_budget) {
+                break;
             }
+            std::size_t remaining = token_budget - totaltokens;
+            con.push_back({result.chunk_id, result.document_id, result.chunk_sequence,result.text,remaining,result.score, true});
             break;
-
+        }
     }
-}
 
     return con;
 }
