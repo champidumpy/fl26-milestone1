@@ -59,12 +59,18 @@ std::size_t ProcessingCore::chunk_count() const noexcept {
 
 std::size_t ProcessingCore::document_frequency(const std::string& term) const {
     // TODO: return the document frequency for the requested term.
+    if (TextProcessor::terms(term).size() > 1) {
+        throw std::invalid_argument("term normalize 1 token");
+    }
     return impl_->index.document_frequency(normalize(term));
 }
 
 std::size_t ProcessingCore::term_frequency(const std::string& term, 
                                            const std::string& chunk_id) const {
     // TODO: return the term frequency for the requested chunk.
+    if (TextProcessor::terms(term).size() > 1) {
+        throw std::invalid_argument("term normalize 1 token");
+    }
     return impl_->index.term_frequency(normalize(term), chunk_id);
 }
 
