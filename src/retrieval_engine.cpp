@@ -8,7 +8,7 @@ namespace aiws {
 
 double RetrievalEngine::canonical_score(double value) {
     // TODO: return the score in the required canonical form.
-    return std::round(value * 100) / 100;
+    return std::round(value * 1e12) / 1e12;
 }
 
 std::vector<SearchResult> RetrievalEngine::search(const std::string& query,
