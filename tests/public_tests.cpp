@@ -60,6 +60,8 @@ int main() {
     catch (const std::invalid_argument&) { negative_threw = true; }
     check(negative_threw, "negative k throws invalid_argument");
 
+    check(TextProcessor::normalize("R2-D2") == "r2 d2" , "rid of hypen and upper case");
+    
     if (failures == 0) {
         std::cout << "All public tests passed.\n";
         return 0;

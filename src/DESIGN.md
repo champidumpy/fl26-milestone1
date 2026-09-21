@@ -10,10 +10,10 @@ Explain the principal data structures, interfaces, and ownership decisions in yo
 Ownership is in processing_core.cpp, since that was where everything would be used, temporary data was only used locally. Main data structures used were vectors and unordered map once. 
 ## 3. Correctness and consistency
 Identify the important invariants or failure cases your design must preserve and explain how your design addresses them.
-Wasn't able to get to finishing the test cases
+The important invariants and fail cases my design perserves are making sure normalization happens through textprocessor and making sure chunks terminate. This is done by not allowing the next chunk start if it goes over the limit. 
 ## 4. Testing strategy
 Explain what your tests cover and which risks or boundaries you considered most important.
-Wasn't able to get to finishing the test cases 
+My test checks one of the examples "R2-D2" to see if it matches what the milestones example shows. I wanted to test to see if it works with the main examples for the normalization in the milestone specification. 
 ## 5. Alternatives considered
 Discuss at least two plausible design alternatives and why you did not choose them.
 One design alternative was to use global and static variables and structures for certain .cpp files, I felt it would lead to more errors with multiple instances. So I kept the original design. 
